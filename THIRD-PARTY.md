@@ -17,4 +17,4 @@ FFmpeg is built without the upstream `--enable-gpl` or `--enable-nonfree` flags.
 
 Shared LGPL runtime libraries remain separate DLLs in `vendor/scrcpy`. They are not modified here and may be replaced with compatible versions. This launcher adds no restrictions on modification or reverse engineering of those components for debugging modifications. Source archives are included for the LGPL libraries, along with their upstream build configuration in the scrcpy source archive.
 
-The launcher runs the original scrcpy executable through its command-line interface. No scrcpy source files were edited. The original executable, DLL, image, and server files are preserved byte for byte.
+The launcher runs the original scrcpy executable through its command-line interface. No scrcpy source files were edited. The original executable, DLL, image, and server files are preserved byte for byte. Optional upstream BAT/VBS helpers are omitted from the native portable release.

@@ -2,18 +2,18 @@
 
 **A portable Windows control panel based on [scrcpy](https://github.com/Genymobile/scrcpy) by Genymobile and Romain Vimont.**
 
-This project adds a dark desktop interface around scrcpy 4.0. Screen mirroring, audio forwarding, recording, and Android control are provided by scrcpy and Android Debug Bridge (ADB). This is an independent launcher, not an official Genymobile product. The bundled scrcpy executables are unchanged.
+This project adds a native C# Windows desktop interface around scrcpy 4.0. Screen mirroring, audio forwarding, recording, and Android control are provided by scrcpy and Android Debug Bridge (ADB). This is an independent launcher, not an official Genymobile product. The bundled scrcpy executables are unchanged.
 
 ![Control panel](UI-preview.png)
 
 ## Start
 
 1. Download or clone this whole project to a writable folder on a Windows 64-bit PC. Extract ZIP downloads first.
-2. Double-click **Launch Control Panel.cmd**.
+2. Double-click **Phone Mirror.exe**.
 3. Enable Android Developer options and USB debugging. Connect with a data cable, unlock the phone, and approve the debugging prompt.
 4. Click **Refresh**, select the device, then **Start mirror**.
 
-scrcpy and its runtime files are included in `vendor/scrcpy`. You do not need a separate scrcpy installation or a fixed Desktop path. Windows PowerShell 5.1 and .NET Framework are used by the launcher. Android 5.0+ supports screen mirroring; audio forwarding requires Android 11+ and depends on app restrictions. Managed PCs may restrict PowerShell or device debugging.
+scrcpy and its runtime files are included in `vendor/scrcpy`. You do not need a separate scrcpy installation or a fixed Desktop path. The native launcher uses .NET Framework 4.8, included on supported Windows 10/11 installations. Running it does not require CMD or PowerShell. Android 5.0+ supports screen mirroring; audio forwarding requires Android 11+ and depends on app restrictions. Managed PCs may restrict PowerShell or device debugging.
 
 ## Features
 
@@ -46,7 +46,7 @@ These are limits, not performance guarantees. Low delay adds no extra video buff
 
 **Start recording** begins a new mirroring session. **Stop session** closes the mirror gracefully and finalizes the recording. Changing recording mode requires a new session. Avoid force-killing a recording process.
 
-**Save screenshot** captures the selected device using ADB, including when no mirror is running. **Open saved files** opens the `Saved` folder beside the launcher. This folder contains recordings, screenshots, and the last address/preset. Pairing codes are not saved. `Saved/` is excluded from Git and release archives.
+**Save screenshot** captures the selected device using ADB, including when no mirror is running. **Open saved files** opens `%LOCALAPPDATA%\PhoneMirror\Saved`. This folder contains recordings, screenshots, and the last address/preset. New native settings use `settings.xml`; older PowerShell settings are not migrated automatically. Pairing codes are not saved. `Saved/` is excluded from Git and release archives.
 
 ### Mirror shortcuts
 
@@ -82,14 +82,20 @@ The official Windows archive was checked against the upstream SHA-256 list. `ven
 
 ## Development and validation
 
-The control panel source is `Scrcpy-Control.ps1`; no build tool is required to run it.
+The control panel source is `src/PhoneMirror.cs`. The executable calls scrcpy and ADB directly using Windows process APIs. Its manifest requests current-user privileges, with no administrator elevation. It is not a PowerShell wrapper. The executable is unsigned; Windows may display an unknown-publisher warning. A checksum confirms file integrity, not publisher identity.
 
 ```powershell
-powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\Scrcpy-Control.ps1 -ValidateOnly
-powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\Scrcpy-Control.ps1 -SmokeTest
+& '.\Phone Mirror.exe' --validate
+& '.\Phone Mirror.exe' --smoke-test
 ```
 
 The smoke test creates `UI-preview.png` and closes the window. It checks UI construction, not a live Android session. Actual USB/Wi-Fi mirroring, audio, and recording require a connected phone and have not been verified end to end for this launcher.
+
+Developers can build the native executable using the Windows .NET Framework compiler:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\Build-Native.ps1
+```
 
 To build a clean portable ZIP:
 
@@ -106,4 +112,4 @@ git remote add origin https://github.com/YOUR-USERNAME/phone-mirror-control-pane
 git push -u origin main
 ```
 
-The runtime binaries are tracked because this repository is intentionally a complete portable bundle. Individual files are below GitHub's 100 MiB file limit. Keep generated ZIPs in GitHub Releases rather than committing them.
+The v1.1.0 portable release includes the native executable and runtime, and omits optional upstream BAT/VBS launchers and developer build scripts. Source code and build scripts remain available in this repository. The runtime binaries are tracked because this repository is intentionally a complete portable bundle. Individual files are below GitHub's 100 MiB file limit. Keep generated ZIPs in GitHub Releases rather than committing them.

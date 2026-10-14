@@ -7,7 +7,7 @@ Copyright (C) 2018-2026 Romain Vimont
 https://github.com/Genymobile/scrcpy
 Licensed under the Apache License, Version 2.0.
 
-This project adds a PowerShell/Windows Forms launcher and documentation.
+This project adds a native C#/Windows Forms launcher and documentation.
 The bundled scrcpy binaries and upstream launcher files are unmodified.
 This project is not affiliated with or endorsed by Genymobile.
 
