@@ -1,0 +1,11 @@
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.md text eol=lf
+*.txt text eol=lf
+*.exe binary
+*.dll binary
+*.png binary
+*.gz binary
+*.xz binary
+vendor/scrcpy/scrcpy-server binary
+vendor/scrcpy/** -text
