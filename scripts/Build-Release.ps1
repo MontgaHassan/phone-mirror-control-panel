@@ -1,7 +1,7 @@
 param([string]$Destination)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-if (!$Destination) { $Destination = Join-Path $root 'dist\phone-mirror-control-panel-v1.1.0-win64.zip' }
+if (!$Destination) { $Destination = Join-Path $root 'dist\phone-mirror-control-panel-v1.2.0-win64.zip' }
 $parent = Split-Path ([IO.Path]::GetFullPath($Destination)) -Parent
 $null = New-Item -ItemType Directory -Force -Path $parent
 $items = @('Phone Mirror.exe','README.md','NOTICE','LICENSE','THIRD-PARTY.md','UI-preview.png','vendor','licenses','third-party-source')

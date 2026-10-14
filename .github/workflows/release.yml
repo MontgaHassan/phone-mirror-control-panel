@@ -1,0 +1,50 @@
+name: Validate and publish native release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Phone Mirror.exe'
+      - '.github/workflows/release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: native-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate checked-in executable
+        shell: pwsh
+        run: |
+          $app = Join-Path $PWD 'Phone Mirror.exe'
+          $process = Start-Process -FilePath $app -ArgumentList '--validate' -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw 'Executable validation failed.' }
+          $process = Start-Process -FilePath $app -ArgumentList '--smoke-test' -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw 'UI smoke test failed.' }
+          & .\scripts\Test-AppMode.ps1
+          if ($LASTEXITCODE -ne 0) { throw 'App-mode tests failed.' }
+      - name: Package and publish versioned portable release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $version = (Get-Item '.\Phone Mirror.exe').VersionInfo.FileVersion
+          $parts = $version.Split('.')
+          $tag = 'v' + ($parts[0..2] -join '.')
+          $zipName = "phone-mirror-control-panel-$tag-win64.zip"
+          $zip = Join-Path $PWD "dist\$zipName"
+          & .\scripts\Build-Release.ps1 -Destination $zip
+          $checksum = Join-Path $PWD "dist\phone-mirror-control-panel-$tag-SHA256SUMS.txt"
+          ((Get-FileHash $zip -Algorithm SHA256).Hash.ToLower() + '  ' + $zipName) | Set-Content $checksum -Encoding ascii
+          gh release view $tag --repo $env:GITHUB_REPOSITORY 2>$null
+          if ($LASTEXITCODE -eq 0) { throw "Release $tag already exists; existing release was preserved." }
+          gh release create $tag $zip $checksum --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title "Phone Mirror $tag - Selected App Mirroring" --notes-file '.\RELEASE-NOTES.md' --latest
+          if ($LASTEXITCODE -ne 0) { throw 'GitHub release publication failed.' }

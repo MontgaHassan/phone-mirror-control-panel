@@ -24,6 +24,16 @@ scrcpy and its runtime files are included in `vendor/scrcpy`. You do not need a 
 - Recording to MKV and screenshots to PNG.
 - Home and volume buttons, shortcut reminders, and session logs.
 
+### Mirror a specific app
+
+1. Connect the phone and select it in the device list.
+2. Set **Mirror source** to **Selected app (separate display)**.
+3. Click **Load apps**, choose an installed launchable app, and click **Start mirror** or **Start recording**.
+
+App mode requires Android 10 or newer. It launches the selected package in a separate virtual display instead of copying the phone's main screen. It does not crop or duplicate the app's existing phone-screen view. Some apps or device vendors may not support opening that app on a secondary display. Failure does not fall back to whole-phone mirroring.
+
+Whole-phone audio, Home, and phone screenshots are disabled in app mode. Use **Start recording** to capture the separate app display. This is not a security sandbox: the app can open other activities on that display. To mirror the phone normally, stop the session and select **Entire phone screen**.
+
 ### Wireless connection
 
 Use the same network as your phone. With a selected USB device, **Switch USB to Wi-Fi** enables TCP/IP and starts mirroring. Refresh afterward to find the network device.
@@ -112,4 +122,4 @@ git remote add origin https://github.com/YOUR-USERNAME/phone-mirror-control-pane
 git push -u origin main
 ```
 
-The v1.1.0 portable release includes the native executable and runtime, and omits optional upstream BAT/VBS launchers and developer build scripts. Source code and build scripts remain available in this repository. The runtime binaries are tracked because this repository is intentionally a complete portable bundle. Individual files are below GitHub's 100 MiB file limit. Keep generated ZIPs in GitHub Releases rather than committing them.
+The v1.2.0 portable release includes the native executable and runtime, and omits optional upstream BAT/VBS launchers and developer build scripts. Source code and build scripts remain available in this repository. The runtime binaries are tracked because this repository is intentionally a complete portable bundle. Individual files are below GitHub's 100 MiB file limit. Keep generated ZIPs in GitHub Releases rather than committing them.
